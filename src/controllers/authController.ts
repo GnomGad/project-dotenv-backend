@@ -3,6 +3,7 @@ import Promise from "bluebird";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Models } from "../db/database";
+import errorHadler from "../utils/errorHadler.js";
 
 export default function getAuthControllers(models: Models) {
     const login = function (req: Request, res: Response) {
@@ -11,7 +12,7 @@ export default function getAuthControllers(models: Models) {
         userPromise
             .then((user) => {
                 if (!user) {
-                    throw Error("404");
+                    throw Error("Пользователя не существует");
                 }
 
                 return user;
@@ -19,7 +20,7 @@ export default function getAuthControllers(models: Models) {
             .then((user) => {
                 console.log(process.env.JWTKEY);
                 if (!bcrypt.compareSync(req.body.password, user.password)) {
-                    throw Error("401");
+                    throw Error("Не верный пароль");
                 }
                 const token = jwt.sign(
                     {
@@ -34,16 +35,7 @@ export default function getAuthControllers(models: Models) {
                 });
             })
             .catch((e) => {
-                if (e.message === "404") {
-                    res.status(404).send("user is don't exists");
-                    return;
-                }
-                if (e.message === "401") {
-                    res.status(401).send("wrong password");
-                    return;
-                }
-                console.error(e);
-                res.status(403).send("failed");
+                errorHadler(e, res);
             });
     };
 
@@ -53,7 +45,7 @@ export default function getAuthControllers(models: Models) {
         userPromise
             .then((user) => {
                 if (user) {
-                    throw Error("409");
+                    throw Error("Пользователь уже создан");
                 }
 
                 return user;
@@ -71,12 +63,7 @@ export default function getAuthControllers(models: Models) {
                 res.status(201).send(`user ${req.body.email} created`);
             })
             .catch((e) => {
-                if (e.message === "409") {
-                    res.status(409).send("user is exists");
-                    return;
-                }
-                console.error(e);
-                res.status(403).send("failed");
+                errorHadler(e, res);
             });
     };
 

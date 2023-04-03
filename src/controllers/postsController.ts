@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import { Models } from "../db/database";
 import { post } from "../db/models/Post";
+import errorHadler from "../utils/errorHadler.js";
 
 export default function getPostControllers(models: Models) {
     function create(req: Request, res: Response) {
@@ -11,9 +12,8 @@ export default function getPostControllers(models: Models) {
             .then(() => {
                 res.send("ok");
             })
-            .catch(() => {
-                res.statusCode = 500;
-                res.send("failed");
+            .catch((e) => {
+                errorHadler(e, res);
             });
     }
 
@@ -29,9 +29,8 @@ export default function getPostControllers(models: Models) {
             .then(() => {
                 res.send("ok");
             })
-            .catch(() => {
-                res.statusCode = 500;
-                res.send("failed");
+            .catch((e) => {
+                errorHadler(e, res);
             });
     };
 
@@ -41,9 +40,8 @@ export default function getPostControllers(models: Models) {
             .then(() => {
                 res.send("ok");
             })
-            .catch(() => {
-                res.statusCode = 500;
-                res.send("failed");
+            .catch((e) => {
+                errorHadler(e, res);
             });
     };
 
@@ -53,9 +51,8 @@ export default function getPostControllers(models: Models) {
             .then((post) => {
                 res.json(post);
             })
-            .catch(() => {
-                res.statusCode = 500;
-                res.send("failed");
+            .catch((e) => {
+                errorHadler(e, res);
             });
     };
 
@@ -65,9 +62,8 @@ export default function getPostControllers(models: Models) {
             .then((posts) => {
                 res.json(posts);
             })
-            .catch(() => {
-                res.statusCode = 500;
-                res.send("failed");
+            .catch((e) => {
+                errorHadler(e, res);
             });
     };
     return { create, update, deleteById, getById, getAll };
